@@ -48,7 +48,7 @@ public class AlertRabbit {
         if (properties.size() != 1) {
             throw new IllegalArgumentException("Something wrong with \"rabbit.properties\" file");
         }
-        if (Integer.parseInt(properties.getProperty("rabbit.interval")) < 1){
+        if (Integer.parseInt(properties.getProperty("rabbit.interval")) < 1) {
             throw new IllegalArgumentException("Wrong timer value");
         }
     }
