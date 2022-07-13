@@ -20,7 +20,7 @@ public class AlertRabbit {
                 cfg.getProperty("rabbit.url"),
                 cfg.getProperty("rabbit.login"),
                 cfg.getProperty("rabbit.password")
-        )){
+        )) {
             Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
             scheduler.start();
             JobDataMap data = new JobDataMap();
@@ -63,13 +63,13 @@ public class AlertRabbit {
         if (Integer.parseInt(properties.getProperty("rabbit.interval")) < 1) {
             throw new IllegalArgumentException("Wrong timer value.");
         }
-        if (properties.getProperty("rabbit.driver").isBlank()){
+        if (properties.getProperty("rabbit.driver").isBlank()) {
             throw new IllegalArgumentException("No driver in property file.");
         }
-        if (properties.getProperty("rabbit.url").isBlank()){
+        if (properties.getProperty("rabbit.url").isBlank()) {
             throw new IllegalArgumentException("Wrong database URL.");
         }
-        if (properties.getProperty("rabbit.login").isBlank() || properties.getProperty("rabbit.password").isBlank()){
+        if (properties.getProperty("rabbit.login").isBlank() || properties.getProperty("rabbit.password").isBlank()) {
             throw new IllegalArgumentException("Database login or password incorrect");
         }
     }
