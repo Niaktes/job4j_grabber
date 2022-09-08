@@ -16,6 +16,7 @@ import java.util.List;
 public class HabrCareerParse implements Parse {
 
     private final DateTimeParser dateTimeParser;
+    public static final int PAGES = 5;
 
     public HabrCareerParse(DateTimeParser dateTimeParser) {
         this.dateTimeParser = dateTimeParser;
@@ -23,13 +24,17 @@ public class HabrCareerParse implements Parse {
 
 
     @Override
-    public List<Post> list(String link) throws IOException {
+    public List<Post> list(String link) {
         List<Post> posts = new ArrayList<>();
-        for (int i = 1; i <= 5; i++) {
-            Connection connection = Jsoup.connect(link + i);
-            Document document = connection.get();
-            Elements rows = document.select(".vacancy-card__inner");
-            rows.forEach(row -> posts.add(createNewPost(row)));
+        for (int i = 1; i <= PAGES; i++) {
+            try {
+                Connection connection = Jsoup.connect(link + i);
+                Document document = connection.get();
+                Elements rows = document.select(".vacancy-card__inner");
+                rows.forEach(row -> posts.add(createNewPost(row)));
+            } catch (IOException e) {
+                throw new IllegalArgumentException("Program execution was interrupted!");
+            }
         }
         return posts;
     }
@@ -60,7 +65,7 @@ public class HabrCareerParse implements Parse {
     }
 
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         DateTimeParser dateTimeParser = new HabrCareerDateTimeParser();
         HabrCareerParse parser = new HabrCareerParse(dateTimeParser);
         String link = "http://career.habr.com/vacancies/java_developer?page=";
