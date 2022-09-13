@@ -5,6 +5,9 @@ import org.quartz.impl.StdSchedulerFactory;
 import ru.job4j.grabber.utils.HabrCareerDateTimeParser;
 
 import java.io.*;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.nio.charset.Charset;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Properties;
@@ -12,6 +15,7 @@ import java.util.Properties;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
+
 
 public class Grabber implements Grab {
 
@@ -65,10 +69,31 @@ public class Grabber implements Grab {
         scheduler.scheduleJob(job, trigger);
     }
 
+    public void web(Store store) {
+        new Thread(() -> {
+            try (ServerSocket server = new ServerSocket(Integer.parseInt(cfg.getProperty("port")))) {
+                while (!server.isClosed()) {
+                    Socket socket = server.accept();
+                    try (OutputStream out = socket.getOutputStream()) {
+                        out.write("HTTP/1.1 200 OK\r\n\r\n".getBytes());
+                        for (Post post : store.getAll()) {
+                            out.write(post.toString().getBytes(Charset.forName("Windows-1251")));
+                            out.write(System.lineSeparator().getBytes());
+                        }
+                    } catch (IOException io) {
+                        io.printStackTrace();
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
 
     private void propertiesValidation(Properties property) {
         final String checkFileText = " Please, check property file.";
-        if (property.size() != 6) {
+        if (property.size() != 7) {
             throw new IllegalArgumentException("Wrong arguments number." + checkFileText);
         }
         if (property.getProperty("store.driver").isBlank()) {
@@ -108,6 +133,10 @@ public class Grabber implements Grab {
     public static void main(String[] args) throws Exception {
         Grabber grab = new Grabber();
         grab.cfg("habrCareerGrabber.properties");
-        grab.init(grab.parser(), grab.store(), grab.scheduler());
+        Parse parser = grab.parser();
+        Store store = grab.store();
+        Scheduler scheduler = grab.scheduler();
+        grab.init(parser, store, scheduler);
+        grab.web(store);
     }
 }
