@@ -15,8 +15,8 @@ import java.util.List;
 
 public class HabrCareerParse implements Parse {
 
-    private final DateTimeParser dateTimeParser;
     public static final int PAGES = 5;
+    private final DateTimeParser dateTimeParser;
 
     public HabrCareerParse(DateTimeParser dateTimeParser) {
         this.dateTimeParser = dateTimeParser;
